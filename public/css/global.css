@@ -175,7 +175,7 @@ body.light-mode .logo img {
     align-items: center;
 }
 
-.nav-links a {
+.nav-links > a {
     text-decoration: none;
     font-family: var(--font-main);
     font-size: 1.3rem;
@@ -190,7 +190,7 @@ body.light-mode .logo img {
     opacity: 0.9;
 }
 
-.nav-links a:hover {
+.nav-links > a:hover {
     transform: translateY(-2px) scale(1.05);
     opacity: 1;
     filter: brightness(1.1);
@@ -310,7 +310,7 @@ footer a:hover {
         display: none;
     }
 
-    .nav-links a {
+    .nav-links > a {
         font-size: 1rem;
     }
 

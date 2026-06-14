@@ -1,0 +1,17 @@
+$kind: http-request
+name: Update My Profile
+method: PUT
+url: '{{baseUrl}}/api/users/profile'
+body:
+  type: formdata
+  content:
+    - key: name
+      type: text
+      value: ''
+    - key: bio
+      type: text
+      value: ''
+    - key: profile_pic
+      type: text
+      value: path/to/profile.jpg
+order: 2000

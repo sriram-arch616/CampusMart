@@ -1,0 +1,5 @@
+$kind: http-request
+name: Cancel Trade Request
+method: DELETE
+url: '{{baseUrl}}/api/chat/trade-request/{{tradeRequestId}}'
+order: 6000

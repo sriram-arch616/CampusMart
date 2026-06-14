@@ -1,0 +1,24 @@
+$kind: collection
+name: CampusMarketPlace API
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'
+variables:
+  - key: baseUrl
+    value: 'http://localhost:5000'
+  - key: authToken
+    value: ''
+  - key: productId
+    value: '1'
+  - key: userId
+    value: '1'
+  - key: conversationId
+    value: '1'
+  - key: tradeRequestId
+    value: '1'
+  - key: notificationId
+    value: '1'
+  - key: messageId
+    value: '1'

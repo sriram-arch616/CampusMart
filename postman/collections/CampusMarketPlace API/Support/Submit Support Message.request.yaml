@@ -1,0 +1,11 @@
+$kind: http-request
+name: Submit Support Message
+method: POST
+url: '{{baseUrl}}/api/support/message'
+body:
+  type: json
+  content: |-
+    {
+      "message": "I need help with my order."
+    }
+order: 1000

@@ -3,9 +3,8 @@ const notificationService = require("../services/notificationService");
 
 
 module.exports = (io) => {
-    // We can store connected users mapped to their socket IDs if needed
-    // Map of userId -> socket.id
-    const userSockets = new Map();
+    // Keep a local Set of registered userIds on this server instance
+    const onlineUsers = new Set();
 
     io.on("connection", (socket) => {
         console.log("Socket connected:", socket.id);
@@ -13,16 +12,19 @@ module.exports = (io) => {
         // User registers their socket with their user ID
         socket.on("register", (userId) => {
             if (userId) {
-                userSockets.set(String(userId), socket.id);
+                const strUserId = String(userId);
+                socket.userId = strUserId;
+                onlineUsers.add(strUserId);
+                socket.join(`user:${strUserId}`);
                 console.log(`User ${userId} registered with socket ${socket.id}`);
                 // Broadcast that this user is online
-                io.emit("user_status", { userId: String(userId), online: true });
+                io.emit("user_status", { userId: strUserId, online: true });
             }
         });
 
         // Handle request for currently online users
         socket.on("request_online_status", () => {
-            socket.emit("online_users_list", Array.from(userSockets.keys()));
+            socket.emit("online_users_list", Array.from(onlineUsers));
         });
 
         // Handle sending a message
@@ -48,19 +50,21 @@ module.exports = (io) => {
                 // Send back to sender for confirmation
                 socket.emit("receive_message", newMessage);
 
-                // If receiver is connected, send it to them
-                    const receiverSocketId = userSockets.get(String(receiverId));
-                    if (receiverSocketId) {
-                        io.to(receiverSocketId).emit("receive_message", newMessage);
-                    } else {
-                        // User is offline, store notification
-                        await notificationService.createNotification(
-                            receiverId,
-                            `New message from User ${senderId}`,
-                            "message",
-                            `/chat?id=${senderId}`
-                        );
-                    }
+                // If receiver is connected (has joined their user room), send to room
+                const receiverRoom = `user:${receiverId}`;
+                const isReceiverOnline = io.sockets.adapter.rooms.has(receiverRoom);
+
+                if (isReceiverOnline) {
+                    io.to(receiverRoom).emit("receive_message", newMessage);
+                } else {
+                    // User is offline, store notification
+                    await notificationService.createNotification(
+                        receiverId,
+                        `New message from User ${senderId}`,
+                        "message",
+                        `/chat?id=${senderId}`
+                    );
+                }
             } catch (err) {
                 console.error("Error saving/sending message:", err);
                 socket.emit("message_error", { error: "Failed to send message" });
@@ -70,7 +74,8 @@ module.exports = (io) => {
         // Handle trade request notifications
         socket.on("trade_request_send", async (data) => {
             const { sellerId, tradeRequest, buyerName } = data;
-            const sellerSocketId = userSockets.get(String(sellerId));
+            const sellerRoom = `user:${sellerId}`;
+            const isSellerOnline = io.sockets.adapter.rooms.has(sellerRoom);
             
             // Store notification in DB regardless of online status for persistent history
             await notificationService.createNotification(
@@ -80,15 +85,16 @@ module.exports = (io) => {
                 `/profile`
             );
 
-            if (sellerSocketId) {
-                io.to(sellerSocketId).emit("trade_request_received", tradeRequest);
+            if (isSellerOnline) {
+                io.to(sellerRoom).emit("trade_request_received", tradeRequest);
             }
             socket.emit("trade_request_received", tradeRequest);
         });
 
         socket.on("trade_request_respond", async (data) => {
             const { buyerId, tradeRequest, sellerName } = data;
-            const buyerSocketId = userSockets.get(String(buyerId));
+            const buyerRoom = `user:${buyerId}`;
+            const isBuyerOnline = io.sockets.adapter.rooms.has(buyerRoom);
 
             await notificationService.createNotification(
                 buyerId,
@@ -97,17 +103,18 @@ module.exports = (io) => {
                 `/profile`
             );
 
-            if (buyerSocketId) {
-                io.to(buyerSocketId).emit("trade_request_updated", tradeRequest);
+            if (isBuyerOnline) {
+                io.to(buyerRoom).emit("trade_request_updated", tradeRequest);
             }
             socket.emit("trade_request_updated", tradeRequest);
         });
         
         socket.on("trade_request_cancel", (data) => {
             const { sellerId, tradeRequest } = data;
-            const sellerSocketId = userSockets.get(String(sellerId));
-            if (sellerSocketId) {
-                io.to(sellerSocketId).emit("trade_request_updated", tradeRequest);
+            const sellerRoom = `user:${sellerId}`;
+            const isSellerOnline = io.sockets.adapter.rooms.has(sellerRoom);
+            if (isSellerOnline) {
+                io.to(sellerRoom).emit("trade_request_updated", tradeRequest);
             }
             // Also echo back to buyer
             socket.emit("trade_request_updated", tradeRequest);
@@ -115,14 +122,17 @@ module.exports = (io) => {
 
         socket.on("disconnect", () => {
             console.log("Socket disconnected:", socket.id);
-            // Remove the user from our tracking map
-            for (const [userId, sockId] of userSockets.entries()) {
-                if (sockId === socket.id) {
-                    userSockets.delete(userId);
+            if (socket.userId) {
+                const userId = socket.userId;
+                const userRoom = `user:${userId}`;
+                
+                // Check if the user has any other active connections/tabs open
+                const socketsInRoom = io.sockets.adapter.rooms.get(userRoom);
+                if (!socketsInRoom || socketsInRoom.size === 0) {
+                    onlineUsers.delete(userId);
                     console.log(`Removed user ${userId} from active sockets`);
                     // Broadcast offline status
                     io.emit("user_status", { userId: userId, online: false });
-                    break;
                 }
             }
         });

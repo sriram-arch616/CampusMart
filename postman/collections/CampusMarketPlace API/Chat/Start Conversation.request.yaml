@@ -1,0 +1,12 @@
+$kind: http-request
+name: Start Conversation
+method: POST
+url: '{{baseUrl}}/api/chat/conversations'
+body:
+  type: json
+  content: |-
+    {
+      "userId2": 2,
+      "productId": 1
+    }
+order: 1000

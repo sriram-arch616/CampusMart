@@ -38,6 +38,9 @@ app.get("/protected", authenticateToken, (req, res) => {
     res.json({ message: "You are authorized!", user: req.user });
 });
 
+const { apiLimiter } = require("./middleware/rateLimiter");
+
+app.use("/api", apiLimiter);
 app.use("/api/products", productRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/users", userRoutes);

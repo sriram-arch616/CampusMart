@@ -1,0 +1,30 @@
+$kind: http-request
+name: Get All Products
+method: GET
+url: '{{baseUrl}}/api/products'
+queryParams:
+  - key: search
+    value: laptop
+    disabled: true
+  - key: category
+    value: electronics
+    disabled: true
+  - key: minPrice
+    value: '10'
+    disabled: true
+  - key: maxPrice
+    value: '500'
+    disabled: true
+  - key: type
+    value: sell
+    disabled: true
+  - key: timeframe
+    value: week
+    disabled: true
+  - key: page
+    value: '1'
+    disabled: true
+  - key: limit
+    value: '12'
+    disabled: true
+order: 1000

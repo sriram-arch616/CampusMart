@@ -169,45 +169,63 @@ exports.respondToTradeRequest = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "Action must be 'accept' or 'reject'." });
     }
 
+    const connection = await db.promise().getConnection();
     try {
-        // Fetch the request
-        const [requests] = await db.promise().query(
-            `SELECT tr.*, p.type AS product_type FROM trade_requests tr JOIN products p ON tr.product_id = p.id WHERE tr.id = ?`,
+        await connection.beginTransaction();
+
+        // Fetch and lock the trade request and the related product
+        const [requests] = await connection.query(
+            `SELECT tr.*, p.type AS product_type, p.status AS product_status 
+             FROM trade_requests tr 
+             JOIN products p ON tr.product_id = p.id 
+             WHERE tr.id = ? FOR UPDATE`,
             [requestId]
         );
 
         if (requests.length === 0) {
+            await connection.rollback();
             return res.status(404).json({ success: false, message: "Trade request not found." });
         }
 
         const tradeReq = requests[0];
 
         if (tradeReq.seller_id !== userId) {
+            await connection.rollback();
             return res.status(403).json({ success: false, message: "Only the seller can respond to this request." });
         }
 
         if (tradeReq.status !== 'pending') {
+            await connection.rollback();
             return res.status(400).json({ success: false, message: "This request has already been responded to." });
         }
 
         const newStatus = action === 'accept' ? 'accepted' : 'rejected';
 
-        await db.promise().query("UPDATE trade_requests SET status = ? WHERE id = ?", [newStatus, requestId]);
-
-        // If accepted, update product status
+        // If accepted, update product status and reject other pending requests
         if (action === 'accept') {
+            if (tradeReq.product_status !== 'available') {
+                await connection.rollback();
+                return res.status(400).json({ success: false, message: "This product is no longer available." });
+            }
+
             const productStatus = tradeReq.product_type === 'sell' ? 'sold' : 'lent';
-            await db.promise().query("UPDATE products SET status = ? WHERE id = ?", [productStatus, tradeReq.product_id]);
+            await connection.query("UPDATE products SET status = ? WHERE id = ?", [productStatus, tradeReq.product_id]);
 
             // Also reject any other pending requests for this product
-            await db.promise().query(
+            await connection.query(
                 "UPDATE trade_requests SET status = 'rejected' WHERE product_id = ? AND id != ? AND status = 'pending'",
                 [tradeReq.product_id, requestId]
             );
         }
 
-        // Return updated request
-        const [updated] = await db.promise().query(
+        // Update target trade request status
+        await connection.query("UPDATE trade_requests SET status = ? WHERE id = ?", [newStatus, requestId]);
+
+        // Commit transaction
+        await connection.commit();
+
+        // Fetch the updated request to return
+        const [updated] = await connection.query(
             `SELECT tr.*, p.title AS product_title, p.type AS product_type, p.price AS product_price,
                     bu.username AS buyer_username, su.username AS seller_username
              FROM trade_requests tr
@@ -220,7 +238,10 @@ exports.respondToTradeRequest = async (req, res, next) => {
 
         res.status(200).json({ success: true, data: updated[0] });
     } catch (err) {
+        await connection.rollback();
         next(err);
+    } finally {
+        connection.release();
     }
 };
 

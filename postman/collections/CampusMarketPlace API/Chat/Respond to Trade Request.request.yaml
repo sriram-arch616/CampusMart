@@ -1,0 +1,11 @@
+$kind: http-request
+name: Respond to Trade Request
+method: PUT
+url: '{{baseUrl}}/api/chat/trade-request/{{tradeRequestId}}'
+body:
+  type: json
+  content: |-
+    {
+      "action": "accept"
+    }
+order: 5000

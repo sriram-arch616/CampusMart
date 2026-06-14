@@ -1,0 +1,14 @@
+$kind: http-request
+name: Verify Email
+method: POST
+url: '{{baseUrl}}/verify-email'
+auth:
+  type: noauth
+body:
+  type: json
+  content: |-
+    {
+      "email": "john@example.com",
+      "otp": "123456"
+    }
+order: 2000

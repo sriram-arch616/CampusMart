@@ -1,0 +1,15 @@
+$kind: http-request
+name: Search Users
+method: GET
+url: '{{baseUrl}}/api/admin/users/search'
+queryParams:
+  - key: username
+    value: john
+    disabled: true
+  - key: page
+    value: '1'
+    disabled: true
+  - key: limit
+    value: '10'
+    disabled: true
+order: 1000

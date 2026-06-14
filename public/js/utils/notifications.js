@@ -94,6 +94,17 @@
     }
 
     async function markAsRead(id) {
+        if (!id || id === 'undefined') return;
+
+        // If it's a temporary client-side notification, just update local state and skip API call
+        if (String(id).startsWith('temp_')) {
+            const notif = notifications.find(n => n.id == id);
+            if (notif) notif.is_read = true;
+            updateBadge();
+            renderNotifications();
+            return;
+        }
+
         try {
             const token = localStorage.getItem("token");
             await fetch(`/api/notifications/${id}/read`, {
@@ -171,9 +182,11 @@
 
     // Handle real-time updates (called from socketClient.js)
     window.addLiveNotification = function(notif) {
-        // Add to the top of the list
+        // Add to the top of the list with a temporary ID
+        const tempId = `temp_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
         notifications.unshift({
             ...notif,
+            id: tempId,
             is_read: false,
             created_at: new Date().toISOString()
         });

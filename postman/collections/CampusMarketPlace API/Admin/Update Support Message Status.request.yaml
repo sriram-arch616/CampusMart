@@ -1,0 +1,11 @@
+$kind: http-request
+name: Update Support Message Status
+method: PUT
+url: '{{baseUrl}}/api/admin/support/messages/{{messageId}}'
+body:
+  type: json
+  content: |-
+    {
+      "status": "resolved"
+    }
+order: 4000

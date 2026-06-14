@@ -1,0 +1,26 @@
+$kind: http-request
+name: Create Product
+method: POST
+url: '{{baseUrl}}/api/products'
+body:
+  type: formdata
+  content:
+    - key: title
+      type: text
+      value: Used Laptop
+    - key: price
+      type: text
+      value: '150'
+    - key: category
+      type: text
+      value: Electronics
+    - key: description
+      type: text
+      value: Good condition
+    - key: type
+      type: text
+      value: sell
+    - key: image
+      type: text
+      value: path/to/image.jpg
+order: 3000

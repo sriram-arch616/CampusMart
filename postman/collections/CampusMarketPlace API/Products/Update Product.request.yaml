@@ -1,0 +1,23 @@
+$kind: http-request
+name: Update Product
+method: PUT
+url: '{{baseUrl}}/api/products/{{productId}}'
+body:
+  type: formdata
+  content:
+    - key: title
+      type: text
+      value: ''
+    - key: price
+      type: text
+      value: ''
+    - key: description
+      type: text
+      value: ''
+    - key: category
+      type: text
+      value: ''
+    - key: type
+      type: text
+      value: ''
+order: 6000

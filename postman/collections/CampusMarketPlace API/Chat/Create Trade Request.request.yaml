@@ -1,0 +1,13 @@
+$kind: http-request
+name: Create Trade Request
+method: POST
+url: '{{baseUrl}}/api/chat/trade-request'
+body:
+  type: json
+  content: |-
+    {
+      "conversationId": 1,
+      "productId": 1,
+      "sellerId": 2
+    }
+order: 4000
