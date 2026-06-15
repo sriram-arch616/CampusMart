@@ -1,12 +1,8 @@
-const db = require("./config/db");
-const bcrypt = require("bcrypt");
 const express = require("express");
-const path = require("path");
-const { authenticateToken } = require("./middleware/authMiddleware");
 const authRoutes = require("./routes/authRoutes");
-const productRoutes = require("./routes/productRoutes");
+const { apiRouter: productRoutes, viewRouter: productViewRoutes } = require("./routes/productRoutes");
 const chatRoutes = require("./routes/chatRoutes");
-const userRoutes = require("./routes/userRoutes");
+const { apiRouter: userRoutes, viewRouter: userViewRoutes } = require("./routes/userRoutes");
 const supportRoutes = require("./routes/supportRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
@@ -17,26 +13,10 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public", { extensions: ["html"] }));
+
 app.use("/", authRoutes);
-
-// Clean Route for Adding Product
-app.get("/add-product", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/addProduct.html"));
-});
-
-// Clean Route for Product Details
-app.get("/product/:id", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/product.html"));
-});
-
-// Clean Route for Public User Profile
-app.get("/user/:id", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/user-profile.html"));
-});
-
-app.get("/protected", authenticateToken, (req, res) => {
-    res.json({ message: "You are authorized!", user: req.user });
-});
+app.use("/", productViewRoutes);
+app.use("/", userViewRoutes);
 
 const { apiLimiter } = require("./middleware/rateLimiter");
 

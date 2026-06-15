@@ -5,6 +5,8 @@ const productController = require("../controllers/productController");
 const { authenticateToken } = require("../middleware/authMiddleware");
 const upload = require("../middleware/uploadMiddleware");
 
+const path = require("path");
+
 router.get("/", authenticateToken, productController.getAllProducts);
 
 router.get("/my-products", authenticateToken, productController.getMyProducts);
@@ -19,4 +21,17 @@ router.put("/:id", authenticateToken, upload.single("image"), productController.
 
 router.delete("/:id", authenticateToken, productController.deleteProduct);
 
-module.exports = router;
+const viewRouter = express.Router();
+
+viewRouter.get("/add-product", (req, res) => {
+    res.sendFile(path.join(__dirname, "../../public/addProduct.html"));
+});
+
+viewRouter.get("/product/:id", (req, res) => {
+    res.sendFile(path.join(__dirname, "../../public/product.html"));
+});
+
+module.exports = {
+    apiRouter: router,
+    viewRouter
+};
