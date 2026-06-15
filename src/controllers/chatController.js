@@ -169,8 +169,9 @@ exports.respondToTradeRequest = async (req, res, next) => {
         return res.status(400).json({ success: false, message: "Action must be 'accept' or 'reject'." });
     }
 
-    const connection = await db.promise().getConnection();
+    let connection;
     try {
+        connection = await db.promise().getConnection();
         await connection.beginTransaction();
 
         // Fetch and lock the trade request and the related product
@@ -238,10 +239,10 @@ exports.respondToTradeRequest = async (req, res, next) => {
 
         res.status(200).json({ success: true, data: updated[0] });
     } catch (err) {
-        await connection.rollback();
+        if (connection) await connection.rollback();
         next(err);
     } finally {
-        connection.release();
+        if (connection) connection.release();
     }
 };
 

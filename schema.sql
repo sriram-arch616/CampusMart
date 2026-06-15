@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     course          VARCHAR(100)  DEFAULT NULL,
     profile_pic     TEXT          DEFAULT NULL,
     role            VARCHAR(20)   DEFAULT 'user',
+    is_verified     BOOLEAN       DEFAULT FALSE,
     created_at      TIMESTAMP     DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -77,6 +78,18 @@ CREATE TABLE IF NOT EXISTS support_messages (
 -- Table: password_resets
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS password_resets (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    email           VARCHAR(100)  NOT NULL,
+    otp             VARCHAR(10)   NOT NULL,
+    expires_at      TIMESTAMP     NOT NULL,
+    created_at      TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (email) REFERENCES users(email) ON DELETE CASCADE
+);
+
+-- --------------------------------------------------------
+-- Table: email_verifications
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS email_verifications (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     email           VARCHAR(100)  NOT NULL,
     otp             VARCHAR(10)   NOT NULL,

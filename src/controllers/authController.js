@@ -38,8 +38,8 @@ exports.register = async (req, res, next) => {
         res.json({ success: true, requireOTP: true, message: "OTP sent to your email", email });
     } catch (error) {
         // Customize error status for specific cases if needed
-        if (error === "User already exists") {
-            return res.status(409).json({ success: false, message: error });
+        if (error.message === "User already exists") {
+            return res.status(409).json({ success: false, message: error.message });
         }
         next(error);
     }

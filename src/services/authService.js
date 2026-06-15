@@ -17,7 +17,12 @@ exports.registerUser = (name, username, email, password) => {
                 [name, username, email, hashedPassword],
                 (err, result) => {
 
-                    if (err) return reject(new Error("Error registering user: " + (err.code === "ER_DUP_ENTRY" ? "User already exists" : err.message)));
+                    if (err) {
+                        if (err.code === "ER_DUP_ENTRY") {
+                            return reject(new Error("User already exists"));
+                        }
+                        return reject(new Error("Error registering user: " + err.message));
+                    }
 
                     resolve("User registered successfully");
                 }
