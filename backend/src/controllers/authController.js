@@ -68,17 +68,34 @@ exports.login = async (req, res, next) => {
     }
 
     try {
-        const token = await authService.loginUser(username, password);
+        const { token, user } = await authService.loginUser(username, password);
+
+        // Set HttpOnly, Secure, SameSite cookie
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 3600000 // 1 hour in ms
+        });
 
         res.json({
             success: true,
             message: "Login successful",
-            token
+            user
         });
     } catch (error) {
         // For security, login errors should generally return 401
         res.status(401).json({ success: false, message: typeof error === "string" ? error : "Invalid credentials" });
     }
+};
+
+exports.logout = (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict"
+    });
+    res.json({ success: true, message: "Logged out successfully" });
 };
 
 exports.forgotPassword = async (req, res, next) => {

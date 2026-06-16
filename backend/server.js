@@ -24,6 +24,8 @@ const io = new Server(server, {
 // Initialize Socket.io logic
 socketConfig(io);
 
+const logger = require("./src/utils/logger");
+
 server.listen(PORT, HOST, () => {
-    console.log(`Server running on http://${HOST}:${PORT} [${process.env.NODE_ENV || "development"}]`);
+    logger.info(`Server running on http://${HOST}:${PORT} [${process.env.NODE_ENV || "development"}]`);
 });

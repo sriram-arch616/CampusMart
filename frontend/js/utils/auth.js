@@ -1,30 +1,16 @@
-function isTokenExpired(token) {
-    if (!token) return true;
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return (Date.now() / 1000) > payload.exp;
-    } catch (e) {
-        return true;
-    }
-}
-
 function getUserId() {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.id;
+        const user = JSON.parse(localStorage.getItem("user"));
+        return user ? user.id : null;
     } catch (e) {
         return null;
     }
 }
 
 function getUserRole() {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.role;
+        const user = JSON.parse(localStorage.getItem("user"));
+        return user ? user.role : null;
     } catch (e) {
         return null;
     }
@@ -41,19 +27,10 @@ function requireAdmin() {
 }
 
 function requireAuth() {
-    const token = localStorage.getItem("token");
-    const isExpired = isTokenExpired(token);
+    const user = localStorage.getItem("user");
     
-    if (!token || isExpired) {
-        if (token) localStorage.removeItem("token");
-        
-        // Save message before redirect to show on login page
-        if (token && isExpired) {
-            sessionStorage.setItem('session_message', 'Login session expired. Please login again.');
-        } else if (!token) {
-            sessionStorage.setItem('session_message', 'Login required.');
-        }
-        
+    if (!user) {
+        sessionStorage.setItem('session_message', 'Login required.');
         window.location.href = "/login";
         return false;
     }
@@ -104,17 +81,17 @@ function requireAuth() {
 })();
 
 function redirectIfAuthenticated() {
-    const token = localStorage.getItem("token");
-    if (token && !isTokenExpired(token)) {
+    const user = localStorage.getItem("user");
+    if (user) {
         window.location.href = "/dashboard";
-    } else if (token) {
-        localStorage.removeItem("token");
     }
 }
 
 function logout() {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
+    fetch("/logout", { method: "POST" }).finally(() => {
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+    });
 }
 
 // Global showConfirm fallback helper (returns Promise resolving to boolean)

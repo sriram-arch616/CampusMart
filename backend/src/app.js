@@ -1,6 +1,10 @@
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
+const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
+const logger = require("./utils/logger");
+
 const authRoutes = require("./routes/authRoutes");
 const { apiRouter: productRoutes } = require("./routes/productRoutes");
 const chatRoutes = require("./routes/chatRoutes");
@@ -11,6 +15,15 @@ const notificationRoutes = require("./routes/notificationRoutes");
 
 
 const app = express();
+
+// Set security HTTP headers
+app.use(helmet({
+    contentSecurityPolicy: false, // Turn off CSP if frontend is served statically/locally via different hosts
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+// Parse cookies
+app.use(cookieParser());
 
 // Configure CORS
 app.use(cors({
@@ -48,8 +61,8 @@ app.use((err, req, res, next) => {
     const errStack = isErrorObj ? err.stack : undefined;
     const status = err.status || 500;
 
-    // Log full error for developers in Render/Local console
-    console.error("Internal Error Log:", {
+    // Log full error via winston structured logger
+    logger.error("Internal Error Log", {
         message: errMessage,
         stack: errStack || "No stack trace available",
         status: status

@@ -56,7 +56,14 @@ exports.loginUser = (username, password) => {
                     { expiresIn: "1h" }
                 );
 
-                resolve(token);
+                resolve({
+                    token,
+                    user: {
+                        id: user.id,
+                        username: user.username,
+                        role: user.role
+                    }
+                });
             });
         });
     });

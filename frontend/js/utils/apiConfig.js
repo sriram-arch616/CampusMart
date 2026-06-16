@@ -7,6 +7,8 @@
     // Monkey-patch window.fetch
     const originalFetch = window.fetch;
     window.fetch = function(input, init) {
+        init = init || {};
+        init.credentials = 'include';
         if (typeof input === 'string') {
             // Intercept relative paths for API endpoints
             if (input.startsWith('/api') || 
@@ -20,7 +22,14 @@
                 input = API_BASE_URL + input;
             }
         }
-        return originalFetch(input, init);
+        return originalFetch(input, init).then(response => {
+            if (response.status === 401 && !window.location.pathname.includes('login') && !window.location.pathname.includes('register') && window.location.pathname !== '/' && !window.location.pathname.includes('index')) {
+                localStorage.removeItem("user");
+                sessionStorage.setItem('session_message', 'Login session expired. Please login again.');
+                window.location.href = "/login";
+            }
+            return response;
+        });
     };
 
     // Expose API_BASE_URL globally

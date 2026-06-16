@@ -128,3 +128,10 @@ CREATE TABLE IF NOT EXISTS notifications (
     created_at      TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- --------------------------------------------------------
+-- Indexes for Performance Tuning
+-- --------------------------------------------------------
+CREATE INDEX idx_products_category ON products(category);
+CREATE INDEX idx_products_status ON products(status);
+
