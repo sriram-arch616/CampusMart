@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusMarketPlace - My Profile</title>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/profile.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+        <div class="logo"><a href="/"><img src="/assets/images/logo.png" alt="CampusMarketPlace"></a></div>
+
+        <nav class="nav-links">
+            <a href="/dashboard">Home</a>
+            <a href="/add-product">Sell/Lend</a>
+            <a href="/chat">Chat</a>
+            <a href="/profile">Profile</a>
+            <div class="notification-container">
+                <button id="notificationBtn" class="notification-btn" onclick="toggleNotifications(event)" title="Notifications">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span id="notificationBadge" class="notification-badge hidden">0</span>
+                </button>
+                <div id="notificationDropdown" class="notification-dropdown">
+                    <div class="notification-header">
+                        <h3>Notifications</h3>
+                        <button id="markAllRead" class="mark-all-read">Mark all as read</button>
+                    </div>
+                    <div id="notificationList" class="notification-list">
+                        <div class="empty-notifications">No notifications yet</div>
+                    </div>
+                </div>
+            </div>
+            <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Theme">
+                <!-- Icon will be injected by theme.js -->
+            </button>
+            <button class="logout-btn" onclick="logout()" title="Logout">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <main class="profile-container">
+        <div class="breadcrumb">
+            <a href="/dashboard">Dashboard</a> / <span>My Profile</span>
+        </div>
+        <section class="profile-section">
+            <div class="profile-header">
+                <div class="profile-pic-wrapper" onclick="document.getElementById('hiddenProfilePicInput').click()"
+                    title="Click to change profile picture">
+                    <img id="profilePicImg" src="/assets/images/NoPfp.jpg" alt="Profile Picture">
+                    <div class="profile-pic-overlay">
+                        <span>Change Photo</span>
+                    </div>
+                </div>
+                <input type="file" id="hiddenProfilePicInput" class="hide" accept="image/*"
+                    onchange="handleDirectPhotoUpload(this)">
+                <!-- Read Mode -->
+                <div id="profileReadMode" class="profile-info">
+                    <h2 id="profileName">Loading Name...</h2>
+                    <p class="profile-username">@<span id="profileUsername">loading</span></p>
+                    <div class="profile-details-grid">
+                        <div class="detail-item"><strong>Email:</strong> <span id="profileEmail"></span></div>
+                        <div class="detail-item"><strong>Mobile:</strong> <span id="profileMobile"></span></div>
+                        <div class="detail-item"><strong>Student Type:</strong> <span id="profileType"></span></div>
+                        <div class="detail-item"><strong>Hostel:</strong> <span id="profileHostel"></span></div>
+                        <div class="detail-item"><strong>Year:</strong> <span id="profileYear"></span></div>
+                        <div class="detail-item"><strong>Course:</strong> <span id="profileCourse"></span></div>
+                    </div>
+                    <button class="btn btn-edit-profile" onclick="toggleEditMode()">✏️ Edit Profile</button>
+                </div>
+                <!-- Edit Mode -->
+                <form id="profileEditForm" class="profile-form hide" onsubmit="handleProfileUpdate(event)">
+                    <div class="form-group">
+                        <label>Profile Picture</label>
+                        <input type="file" id="editProfilePic" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <input type="text" id="editMobile">
+                    </div>
+                    <div class="form-group">
+                        <label>Student Type</label>
+                        <select id="editType">
+                            <option value="">Select</option>
+                            <option value="Hosteller">Hosteller</option>
+                            <option value="Day Scholar">Day Scholar</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Hostel Details</label>
+                        <input type="text" id="editHostel">
+                    </div>
+                    <div class="form-group">
+                        <label>Year of Study</label>
+                        <input type="text" id="editYear">
+                    </div>
+                    <div class="form-group">
+                        <label>Course</label>
+                        <input type="text" id="editCourse">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-save">Save Changes</button>
+                        <button type="button" class="btn btn-cancel" onclick="toggleEditMode()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section class="my-products-section">
+            <br>
+            <h2>Products</h2>
+            <div id="myProductContainer" class="product-grid">
+                <!-- Products dynamically loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for editing a product -->
+    <div id="editProductModal" class="modal hide">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Product</h2>
+            <form id="editProductForm" onsubmit="handleProductUpdate(event)">
+                <input type="hidden" id="editProductId">
+
+                <div class="form-group">
+                    <label>Product Title</label>
+                    <input type="text" id="editPTitle" required placeholder="e.g. Scientific Calculator">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="editPDesc" required placeholder="Describe your item..."></textarea>
+                </div>
+
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="editPPrice" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="editPCat" required>
+                            <option value="">Select Category</option>
+                            <option>Electronics</option>
+                            <option>Books & Study Material</option>
+                            <option>Furniture & Decor</option>
+                            <option>Clothing & Fashion</option>
+                            <option>Vehicles (Bicycles/Scooters)</option>
+                            <option>Home & Kitchen</option>
+                            <option>Sports & Fitness</option>
+                            <option>Services (Tuition/Projects)</option>
+                            <option>Others</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Transaction Type</label>
+                    <select id="editPType" required>
+                        <option value="sell">Sell (For Buy)</option>
+                        <option value="lend">Lend (For Rent)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Product Image (Optional)</label>
+                    <input type="file" id="editPImage" accept="image/*">
+                </div>
+
+                <br>
+                <button type="submit" class="btn btn-save" style="width: 100%; justify-content: center;">Save
+                    Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <a href="/support#about">About</a>
+        <a href="/support#contact">Contact Us</a>
+        <a href="/support#support">Support</a>
+        <br><br>
+        &copy; 2026 CampusMarketPlace. All Rights Reserved.
+    </footer>
+    <script src="/js/utils/theme.js"></script>
+    <script src="/js/utils/auth.js"></script>
+    <script src="/js/utils/apiConfig.js"></script>
+    <script src="/js/utils/notifications.js"></script>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script src="/js/utils/socketClient.js"></script>
+    <script src="/js/profile.js"></script>
+</body>
+
+</html>
+
+

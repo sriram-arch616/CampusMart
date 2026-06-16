@@ -1,0 +1,8 @@
+{
+  "public": "frontend",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "product/:id", "destination": "/product.html" },
+    { "source": "user/:id", "destination": "/user.html" }
+  ]
+}

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusMarketPlace - Add Product</title>
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/addProduct.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo"><a href="/"><img src="/assets/images/logo.png" alt="CampusMarketPlace"></a></div>
+        <nav class="nav-links">
+            <a href="/dashboard">Home</a>
+            <a href="/add-product">Sell/Lend</a>
+            <a href="/chat">Chat</a>
+            <a href="/profile">Profile</a>
+            <div class="notification-container">
+                <button id="notificationBtn" class="notification-btn" onclick="toggleNotifications(event)" title="Notifications">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span id="notificationBadge" class="notification-badge hidden">0</span>
+                </button>
+                <div id="notificationDropdown" class="notification-dropdown">
+                    <div class="notification-header">
+                        <h3>Notifications</h3>
+                        <button id="markAllRead" class="mark-all-read">Mark all as read</button>
+                    </div>
+                    <div id="notificationList" class="notification-list">
+                        <div class="empty-notifications">No notifications yet</div>
+                    </div>
+                </div>
+            </div>
+            <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Theme">
+                <!-- Icon will be injected by theme.js -->
+            </button>
+            <button class="logout-btn" onclick="logout()" title="Logout">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="breadcrumb">
+            <a href="/dashboard">Dashboard</a> / <span>Add Product</span>
+        </div>
+
+        <div class="toggle-container">
+            <button id="sellBtn" class="active">Sell</button>
+            <button id="lendBtn">Lend</button>
+        </div>
+
+        <div class="flip-container">
+
+            <div class="flip-card" id="flipCard">
+
+
+                <div class="front">
+
+                    <div class="glass-form">
+                        <form id="sellForm">
+
+                            <div class="form-layout">
+
+                                <div class="left-section">
+
+                                    <label>Title</label>
+                                    <input type="text" id="sellTitle" required>
+
+                                    <label>Price (₹)</label>
+                                    <input type="number" id="sellPrice" required>
+
+                                    <label>Category</label>
+                                    <select id="sellCategory" required>
+                                        <option value="">Select</option>
+                                        <option>Electronics</option>
+                                        <option>Books & Study Material</option>
+                                        <option>Furniture & Decor</option>
+                                        <option>Clothing & Fashion</option>
+                                        <option>Vehicles (Bicycles/Scooters)</option>
+                                        <option>Home & Kitchen</option>
+                                        <option>Sports & Fitness</option>
+                                        <option>Services (Tuition/Projects)</option>
+                                        <option>Others</option>
+                                    </select>
+
+                                </div>
+
+                                <div class="divider"></div>
+
+                                <div class="right-section">
+
+                                    <label>Description</label>
+                                    <textarea id="sellDescription" required></textarea>
+
+                                    <label>Upload Image</label>
+
+                                    <div class="image-preview" id="previewSellContainer">
+                                        <div class="no-image-placeholder">
+                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                                <polyline points="21 15 16 10 5 21" />
+                                            </svg>
+                                            <span>No Image Selected</span>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" id="imageSell" accept="image/*">
+
+                                </div>
+
+                            </div>
+
+                            <div class="submit-area">
+                                <button type="submit">Sell Item</button>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+
+
+
+                <div class="back">
+
+                    <div class="glass-form">
+                        <form id="lendForm">
+
+                            <div class="form-layout">
+
+                                <div class="left-section">
+
+                                    <label>Title</label>
+                                    <input type="text" id="lendTitle" required>
+
+                                    <label>Price/Day (₹)</label>
+                                    <input type="number" id="lendPrice" required>
+
+                                    <label>Category</label>
+                                    <select id="lendCategory" required>
+                                        <option value="">Select</option>
+                                        <option>Electronics</option>
+                                        <option>Books & Study Material</option>
+                                        <option>Furniture & Decor</option>
+                                        <option>Clothing & Fashion</option>
+                                        <option>Vehicles (Bicycles/Scooters)</option>
+                                        <option>Home & Kitchen</option>
+                                        <option>Sports & Fitness</option>
+                                        <option>Services (Tuition/Projects)</option>
+                                        <option>Others</option>
+                                    </select>
+
+                                </div>
+
+                                <div class="divider"></div>
+
+                                <div class="right-section">
+
+                                    <label>Description</label>
+                                    <textarea id="lendDescription" required></textarea>
+
+                                    <label>Upload Image</label>
+
+                                    <div class="image-preview" id="previewLendContainer">
+                                        <div class="no-image-placeholder">
+                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                                <polyline points="21 15 16 10 5 21" />
+                                            </svg>
+                                            <span>No Image Selected</span>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" id="imageLend" accept="image/*">
+
+                                </div>
+
+                            </div>
+
+                            <div class="submit-area">
+                                <button type="submit">Lend Item</button>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer>
+        <a href="/support#about">About</a>
+        <a href="/support#contact">Contact Us</a>
+        <a href="/support#support">Support</a>
+        <br><br>
+        &copy; 2026 CampusMarketPlace. All Rights Reserved.
+    </footer>
+
+    <script src="/js/utils/theme.js"></script>
+    <script src="/js/utils/auth.js"></script>
+    <script src="/js/utils/apiConfig.js"></script>
+    <script src="/js/utils/notifications.js"></script>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script src="/js/utils/socketClient.js"></script>
+    <script src="/js/addProduct.js"></script>
+
+</body>
+
+</html>
+
+
