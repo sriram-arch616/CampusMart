@@ -10,24 +10,26 @@ A professional, feature-rich marketplace designed for university students to buy
 
 ## 🌟 Key Features
 
-- **🔐 Secure Authentication**: JWT-based login with encrypted password storage using Bcrypt.
-- **🛒 Product Management**: Full CRUD operations for listing items, with image uploads hosted on Cloudinary.
-- **💬 Real-time Chat**: Integrated messaging system using Socket.io for instant communication between buyers and sellers.
-- **🔍 Advanced Filtering**: Search by title, filter by category, price range, and item type (buy/rent).
-- **🛡️ Admin Dashboard**: Dedicated tools for managing users, products, and support tickets.
-- **📞 Support System**: Built-in support portal for users to raise issues and track resolutions.
-- **📱 Responsive UI**: Clean, modern design optimized for both desktop and mobile use.
+- **🔐 Secure Authentication & Middleware**: JWT-based authentication stored in secure HttpOnly cookies, encrypted password storage using Bcrypt, API request rate limiting (`express-rate-limit`), and HTTP headers security (`helmet`).
+- **🛒 Product Management**: Full CRUD operations for listing items, with cloud-hosted image uploads via Multer and Cloudinary.
+- **💬 Scalable Real-time Chat**: Integrated messaging system using Socket.io, with a **Redis adapter** for horizontal scaling and multi-instance compatibility.
+- **🔍 Advanced Filtering**: Search items by title, category, price range, and type (buy/rent).
+- **🛡️ Admin Dashboard**: Administration portal to manage users, listings, and support tickets.
+- **📞 Support Ticket System**: Built-in support portal for raising issues and tracking resolutions.
+- **🐳 Containerized Deployment**: Ready-to-deploy multi-container environment orchestrated via Docker Compose.
+- **📱 Responsive UI**: A premium, modern interface served via Nginx and styled with responsive CSS.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Backend**: [Node.js](https://nodejs.org/), [Express.js](https://expressjs.com/)
-- **Database**: [MySQL](https://www.mysql.com/) (Managed on TiDB Cloud)
-- **Real-time**: [Socket.io](https://socket.io/)
-- **Image Storage**: [Cloudinary](https://cloudinary.com/) (via Multer)
-- **Security**: [JSON Web Tokens (JWT)](https://jwt.io/), [Bcrypt](https://github.com/kelektiv/node.bcrypt.js)
-- **Frontend**: HTML5, CSS3, JavaScript
+- **Backend**: Node.js, Express.js
+- **Frontend**: HTML5, CSS3, JavaScript, Nginx (production server)
+- **Database**: MySQL (compatible with TiDB Cloud / local server)
+- **Real-time Engine & Caching**: Socket.io, Redis (Pub/Sub Adapter)
+- **Image Storage**: Cloudinary (via Multer middleware)
+- **Security**: JSON Web Tokens (JWT), Bcrypt, Helmet.js, Express Rate Limit
+- **Containerization**: Docker, Docker Compose
 
 ---
 
@@ -67,16 +69,34 @@ npm start
 ```
 The server will start on `http://localhost:5000`.
 
+### 6. Running with Docker 🐳
+This project is fully containerized using Docker and Docker Compose, which automatically provisions MySQL, Redis, the Node.js backend, and the Nginx-based frontend.
+
+1. Make sure you have **Docker** and **Docker Compose** installed.
+2. Build and start all services in the background or active terminal:
+   ```bash
+   docker-compose up --build
+   ```
+3. Access the services:
+   - **Frontend client**: [http://localhost](http://localhost) (mapped to port 80)
+   - **Backend API server**: [http://localhost:5000](http://localhost:5000)
+
 ---
 
 ## 📁 Project Structure
 
-- `src/app.js`: Main application entry point.
-- `src/controllers/`: Logic handlers for various routes.
-- `src/services/`: Core business logic and database interactions.
-- `src/routes/`: API endpoint definitions.
-- `src/config/`: Configuration for DB, Cloudinary, and Socket.io.
-- `public/`: Statis frontend files (HTML, CSS, JS).
+- **`backend/`**: Node.js & Express.js server application.
+  - `src/app.js`: Main API entry point.
+  - `src/controllers/`: Route controller handlers.
+  - `src/services/`: Database interaction logic and services.
+  - `src/routes/`: Express router endpoint definitions.
+  - `src/config/`: DB connection, Cloudinary, and Socket.io configuration.
+  - `schema.sql`: Database initialization schema.
+- **`frontend/`**: Static SPA client application (served via Nginx in Docker).
+  - HTML pages (`index.html`, `dashboard.html`, `chat.html`, `support.html`, etc.).
+  - `js/`: Client-side logic, API fetch functions, and Socket.io client listeners.
+  - `css/`: Clean, responsive stylesheets.
+- **`docker-compose.yml`**: Multi-container Docker deployment configuration orchestrating the frontend, backend, database, and Redis.
 
 ---
 
