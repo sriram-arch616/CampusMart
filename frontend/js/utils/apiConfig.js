@@ -1,8 +1,8 @@
 (function() {
-    // Define the backend URL. In production, change this to your deployed API server URL.
-    const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:5000'
-        : ''; // Fallback or configured production URL (same origin by default if empty)
+    // Define the backend URL. In production, same origin by default (served/proxied via Nginx)
+    const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port !== '5000'
+        ? `${window.location.protocol}//${window.location.hostname}:5000`
+        : '';
 
     // Monkey-patch window.fetch
     const originalFetch = window.fetch;

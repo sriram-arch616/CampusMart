@@ -5,18 +5,15 @@
 
     function initSocket() {
         // Need to identify the current user to register
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        // Simple helper to get userId from JWT if needed, or if stored
         let userId = null;
         try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            userId = payload.id;
+            const user = JSON.parse(localStorage.getItem("user"));
+            userId = user ? user.id : null;
         } catch (e) {
-            console.error("Error parsing token for socket registration");
+            console.error("Error parsing user from localStorage for socket registration");
             return;
         }
+        if (!userId) return;
 
         if (typeof io !== 'undefined') {
             socket = io(window.API_BASE_URL || '');

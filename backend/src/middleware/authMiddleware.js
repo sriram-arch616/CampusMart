@@ -20,7 +20,7 @@ const authenticateToken = (req, res, next) => {
                 return res.status(401).json({ message: "Token expired" });
             }
 
-            return res.status(403).json({ message: "Invalid token" });
+            return res.status(401).json({ message: "Invalid token" });
         }
 
         req.user = decoded;

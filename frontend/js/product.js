@@ -140,6 +140,7 @@ function renderProduct(product) {
             if (!confirmed) return;
             
             try {
+                const token = localStorage.getItem("token");
                 const res = await fetch(`/api/products/${product.id}`, {
                     method: "DELETE",
                     headers: { "Authorization": `Bearer ${token}` }

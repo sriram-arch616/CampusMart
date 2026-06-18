@@ -36,7 +36,7 @@ async function loadUsers(username = "", page = 1) {
     currentUserPage = page;
     try {
         const token = localStorage.getItem("token");
-        const response = await fetch(`/api/admin/users/search?username=${username}&page=${page}`, {
+        const response = await fetch(`/api/admin/users/search?username=${encodeURIComponent(username)}&page=${page}`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
         const result = await response.json();

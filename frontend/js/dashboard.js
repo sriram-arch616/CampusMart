@@ -67,7 +67,7 @@ async function filterProducts() {
     const token = localStorage.getItem("token");
 
     try {
-        let url = `/api/products?search=${search}&category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}&type=${type}&timeframe=${timeframe}&page=${currentPage}`;
+        let url = `/api/products?search=${encodeURIComponent(search)}&category=${encodeURIComponent(category)}&minPrice=${encodeURIComponent(minPrice)}&maxPrice=${encodeURIComponent(maxPrice)}&type=${encodeURIComponent(type)}&timeframe=${encodeURIComponent(timeframe)}&page=${currentPage}`;
         
         const res = await fetch(url, {
             headers: {
@@ -281,7 +281,12 @@ async function deleteProductAdmin(productId, event) {
         const result = await response.json();
         if (result.success) {
             showToast("Product deleted successfully", "success");
-            fetchProducts(); // Refresh the list
+            const search = searchInput ? searchInput.value : "";
+            if (search || document.getElementById("fCategory").value) {
+                filterProducts();
+            } else {
+                fetchProducts();
+            }
         } else {
             showToast(result.message || "Failed to delete product", "error");
         }

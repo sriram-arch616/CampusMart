@@ -70,11 +70,12 @@ exports.login = async (req, res, next) => {
     try {
         const { token, user } = await authService.loginUser(username, password);
 
-        // Set HttpOnly, Secure, SameSite cookie
+        // Set HttpOnly, Secure, SameSite cookie dynamically based on connection protocol
+        const isSecure = req.secure || req.headers["x-forwarded-proto"] === "https";
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: isSecure,
+            sameSite: isSecure ? "strict" : "lax",
             maxAge: 3600000 // 1 hour in ms
         });
 
@@ -90,10 +91,11 @@ exports.login = async (req, res, next) => {
 };
 
 exports.logout = (req, res) => {
+    const isSecure = req.secure || req.headers["x-forwarded-proto"] === "https";
     res.clearCookie("token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict"
+        secure: isSecure,
+        sameSite: isSecure ? "strict" : "lax"
     });
     res.json({ success: true, message: "Logged out successfully" });
 };

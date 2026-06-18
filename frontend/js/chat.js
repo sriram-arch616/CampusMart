@@ -47,20 +47,17 @@ const onlineUsers = new Set();
 
 // Initialize chat application
 async function initChat() {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    const user = localStorage.getItem("user");
+    if (!user) {
         window.location.href = "/login";
         return;
     }
 
     try {
         // Fetch current user info
-        const res = await fetch("/protected", {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
+        const res = await fetch("/protected");
 
         if (!res.ok) {
-            localStorage.removeItem("token");
             window.location.href = "/login";
             return;
         }
@@ -138,11 +135,8 @@ function updateCurrentChatHeaderStatus() {
 }
 
 async function loadConversations() {
-    const token = localStorage.getItem("token");
     try {
-        const res = await fetch("/api/chat/conversations", {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
+        const res = await fetch("/api/chat/conversations");
 
         if (!res.ok) throw new Error("Failed to fetch conversations");
 
@@ -279,16 +273,11 @@ async function loadMessages(conversationId, receiverId, receiverName, receiverPi
 
     chatMessages.innerHTML = ""; // Clear current messages
 
-    const token = localStorage.getItem("token");
     try {
         // Fetch messages and trade requests in parallel
         const [messagesRes, tradeRes] = await Promise.all([
-            fetch(`/api/chat/conversations/${conversationId}/messages`, {
-                headers: { "Authorization": `Bearer ${token}` }
-            }),
-            fetch(`/api/chat/trade-requests/${conversationId}`, {
-                headers: { "Authorization": `Bearer ${token}` }
-            })
+            fetch(`/api/chat/conversations/${conversationId}/messages`),
+            fetch(`/api/chat/trade-requests/${conversationId}`)
         ]);
 
         if (!messagesRes.ok) throw new Error("Failed to fetch messages");
@@ -372,7 +361,6 @@ function updateTradeDealButton() {
 tradeDealBtn.addEventListener("click", async () => {
     if (!currentProduct || !currentConversationId) return;
 
-    const token = localStorage.getItem("token");
     try {
         tradeDealBtn.disabled = true;
         tradeDealBtn.style.opacity = "0.5";
@@ -380,8 +368,7 @@ tradeDealBtn.addEventListener("click", async () => {
         const res = await fetch("/api/chat/trade-request", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 conversationId: currentConversationId,
@@ -404,6 +391,9 @@ tradeDealBtn.addEventListener("click", async () => {
             sellerId: currentProduct.seller_id,
             tradeRequest: result.data
         });
+
+        // Update DOM immediately
+        addTradeRequestToDOM(result.data);
 
         // Hide button after sending request
         tradeDealBtn.style.display = "none";
@@ -507,13 +497,11 @@ function updateTradeRequestInDOM(tr) {
 }
 
 async function respondTradeRequest(requestId, action, buyerId) {
-    const token = localStorage.getItem("token");
     try {
         const res = await fetch(`/api/chat/trade-request/${requestId}`, {
             method: "PUT",
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({ action })
         });
@@ -531,6 +519,9 @@ async function respondTradeRequest(requestId, action, buyerId) {
             tradeRequest: result.data
         });
 
+        // Update DOM immediately
+        updateTradeRequestInDOM(result.data);
+
         const actionText = action === "accept" ? "accepted" : "rejected";
         showToast(`Trade request ${actionText}!`, action === "accept" ? "success" : "info");
 
@@ -544,13 +535,9 @@ async function cancelTradeRequest(requestId, sellerId) {
     const confirmed = await showConfirm("Are you sure you want to cancel this trade request?");
     if (!confirmed) return;
 
-    const token = localStorage.getItem("token");
     try {
         const res = await fetch(`/api/chat/trade-request/${requestId}`, {
-            method: "DELETE",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
+            method: "DELETE"
         });
 
         const result = await res.json();
@@ -565,6 +552,9 @@ async function cancelTradeRequest(requestId, sellerId) {
             sellerId: sellerId,
             tradeRequest: result.data
         });
+
+        // Update DOM immediately
+        updateTradeRequestInDOM(result.data);
 
         showToast("Trade request cancelled.", "info");
 
@@ -630,15 +620,13 @@ let targetConversationId = null;
 let targetUserId = null;
 
 if (newChatUserId) {
-    targetUserId = newChatUserId;
-    // Create or get conversation first, then init
-    const token = localStorage.getItem("token");
-    if (token) {
+    targetUserId = targetUserId || newChatUserId;
+    const user = localStorage.getItem("user");
+    if (user) {
         fetch("/api/chat/conversations", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({ userId2: newChatUserId, productId: newChatProductId })
         }).then(res => res.json()).then(data => {
