@@ -102,8 +102,8 @@ This project is fully containerized using Docker and Docker Compose, which autom
 
 ## 👨‍💻 Author
 
-**Sri Ram Kumar V**
-**A.S. Manoj**
+- **Sri Ram Kumar V**
+- **A.S. Manoj**
 ---
 
 ## 📜 License
