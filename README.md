@@ -43,8 +43,8 @@ A professional, feature-rich marketplace designed for university students to buy
 ### 2. Installation
 Clone the repository and install dependencies:
 ```bash
-git clone https://github.com/A-S-Manoj/CampusMarketPlace.git
-cd CampusMarketPlace
+git clone https://github.com/sriram-arch616/CampusMart.git
+cd CampusMart
 npm install
 ```
 
@@ -102,6 +102,7 @@ This project is fully containerized using Docker and Docker Compose, which autom
 
 ## 👨‍💻 Author
 
+**Sri Ram Kumar V**
 **A.S. Manoj**
 ---
 
